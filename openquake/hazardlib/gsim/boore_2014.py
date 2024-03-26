@@ -271,6 +271,9 @@ class BooreEtAl2014(GMPE):
     #: Required distance measure is Rjb
     REQUIRES_DISTANCES = {'rjb'}
 
+    #: Reference rock conditions as defined at page
+    DEFINED_FOR_REFERENCE_VELOCITY = 760.
+
     kind = "base"
 
     def __init__(self, region='nobasin', sof=True, sigma_mu_epsilon=0.0, **kwargs):

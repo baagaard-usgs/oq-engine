@@ -402,6 +402,9 @@ class CampbellBozorgnia2014(GMPE):
     #: Required distance measures are Rrup, Rjb and Rx
     REQUIRES_DISTANCES = {'rrup', 'rjb', 'rx'}
 
+    #: Reference rock conditions as defined at page
+    DEFINED_FOR_REFERENCE_VELOCITY = 1100.
+
     SJ = 0  # 1 for Japan
 
     def __init__(self, sigma_mu_epsilon=0.0, **kwargs):

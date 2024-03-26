@@ -335,6 +335,10 @@ class ParkerEtAl2020SInter(GMPE):
     REQUIRES_DISTANCES = {'rrup'}
     REQUIRES_ATTRIBUTES = {'region', 'saturation_region', 'basin'}
 
+    #: Reference rock conditions as defined at page
+    DEFINED_FOR_REFERENCE_VELOCITY = 760.
+
+
     def __init__(self, region=None, saturation_region=None, basin=None,
                  **kwargs):
         """
