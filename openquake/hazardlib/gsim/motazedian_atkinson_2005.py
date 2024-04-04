@@ -138,7 +138,8 @@ class MotazedianAtkinson2005(GMPE):
                 _compute_hinge_function(ctx.mag, R) + \
                 _compute_anelastic_attenuation(C, R)
             mean[m] *= BASE_10_TO_E
-            mean[m] -= LN_CM_TO_G
+            if str(imt) != "PGV":
+                mean[m] -= LN_CM_TO_G
 
             sig[m] = 0.28 * BASE_10_TO_E
 
@@ -215,7 +216,8 @@ class MotazedianAtkinson2005USGS(MotazedianAtkinson2005):
                 _compute_hinge_function(ctx.mag, R) + \
                 _compute_anelastic_attenuation(C, R)
             mean[m] *= BASE_10_TO_E
-            mean[m] -= LN_CM_TO_G
+            if str(imt) != "PGV":
+                mean[m] -= LN_CM_TO_G
 
             # Add site response from Boore and Atkinson, 2006
             COEFFS_SOIL = AtkinsonBoore2006.COEFFS_SOIL_RESPONSE[imt]
