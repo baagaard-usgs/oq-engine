@@ -63,7 +63,7 @@ def _get_centered_z1pt0(clsname, ctx):
 
 def _get_centered_ztor(ctx):
     """
-    Get ztor centered on the M- dependent avarage ztor(km)
+    Get ztor centered on the M- dependent average ztor(km)
     by different fault types.
     """
     # Strike-slip and normal faulting
