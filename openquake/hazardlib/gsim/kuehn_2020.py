@@ -790,5 +790,7 @@ REGION_ALIASES = {
 
 
 for region in SUPPORTED_REGIONS[1:]:
-    add_alias("KuehnEtAl2021SInter" + REGION_ALIASES[region],
+    add_alias("KuehnEtAl2020SInter" + REGION_ALIASES[region],
+              KuehnEtAl2020SInter, region=region)
+    add_alias("KuehnEtAl2020SSlab" + REGION_ALIASES[region],
               KuehnEtAl2020SInter, region=region)
