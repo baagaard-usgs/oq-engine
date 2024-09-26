@@ -403,6 +403,20 @@ def get_tau(C, mag):
     return C['tau1'] + (C['tau2'] - C['tau1']) / 1.5 * mag_test
 
 
+def get_mean_stddevs_nosite(name, C, ctx):
+    """
+    Return mean and standard deviation values
+    """
+    # Get ground motion on reference rock
+    ln_y_ref = get_ln_y_ref(name, C, ctx)
+    y_ref = np.exp(ln_y_ref)
+
+    mean = ln_y_ref
+    sig, tau, phi = get_stddevs(name, C, ctx, ctx.mag, y_ref, np.zeros_like(y_ref))
+
+    return mean, sig, tau, phi
+
+
 def get_mean_stddevs(name, C, ctx):
     """
     Return mean and standard deviation values

@@ -217,28 +217,33 @@ def _get_regional_term(region, C, imt, vs30, rrup):
         return 0.
 
 
+def _get_linear_site_term(C, imt, vs30):
+    vs30_norm = _get_vs30star(vs30, imt) / C['vlin']
+
+    fsite = np.zeros_like(vs30)
+    lt_vlin = vs30 < C['vlin']
+    fsite = lt_vlin * C['a10'] * np.log(vs30_norm)
+    fsite += ~lt_vlin * ((C['a10'] + C['b'] * CONSTS['n']) * np.log(vs30_norm))
+    return fsite
+
+
+def _get_nonlinear_site_term(C, imt, vs30, sa1180):
+    vs30_norm = _get_vs30star(vs30, imt) / C['vlin']
+
+    fsite = np.zeros_like(vs30)
+    lt_vlin = vs30 < C['vlin']
+    fsite = lt_vlin * C['b'] * (-np.log(sa1180 + C['c']) +
+                                np.log(sa1180 + C['c'] * vs30_norm**CONSTS['n']))
+    return fsite
+
+
 def _get_site_response_term(C, imt, vs30, sa1180):
     """
     Compute and return site response model term see page 1033
     """
-    # vs30 star
-    vs30_star = _get_vs30star(vs30, imt)
-    # compute the site term
-    site_resp_term = np.zeros_like(vs30)
-    gt_vlin = vs30 >= C['vlin']
-    lw_vlin = vs30 < C['vlin']
-    # compute site response term for ctx with vs30 greater than vlin
-    vs30_rat = vs30_star / C['vlin']
-    site_resp_term[gt_vlin] = ((C['a10'] + C['b'] * CONSTS['n']) *
-                               np.log(vs30_rat[gt_vlin]))
-    # compute site response term for ctx with vs30 lower than vlin
-    site_resp_term[lw_vlin] = (C['a10'] * np.log(vs30_rat[lw_vlin]) -
-                               C['b'] * np.log(sa1180[lw_vlin] + C['c']) +
-                               C['b'] * np.log(sa1180[lw_vlin] + C['c'] *
-                                               vs30_rat[lw_vlin] **
-                                               CONSTS['n']))
-    return site_resp_term
-
+    fsite = _get_linear_site_term(C, imt, vs30)
+    fsite += _get_nonlinear_site_term(C, imt, vs30, sa1180)
+    return fsite
 
 def _get_soil_depth_term(region, C, z1pt0, vs30):
     """
@@ -394,6 +399,19 @@ def _get_sa_at_1180(region, C, imt, ctx):
             _get_top_of_rupture_depth_term(C, imt, ctx) +
             _get_soil_depth_term(region, C, fake_z1pt0, vs30_1180) +
             _get_regional_term(region, C, imt, vs30_1180, ctx.rrup))
+
+
+def get_mean_nosite(C, imt, ctx):
+    f1 = _get_basic_term(C, ctx)
+    f2 = _get_faulting_style_term(C, ctx)
+    f3 = _get_hanging_wall_term(C, ctx)
+    f4 = _get_top_of_rupture_depth_term(C, imt, ctx)
+    return (_get_basic_term(C, ctx) +
+            _get_faulting_style_term(C, ctx) +
+            _get_hanging_wall_term(C, ctx) +
+            _get_top_of_rupture_depth_term(C, imt, ctx)
+            )
+    
 
 def get_epistemic_sigma(ctx):
     """

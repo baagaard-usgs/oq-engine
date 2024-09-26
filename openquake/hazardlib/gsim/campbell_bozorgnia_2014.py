@@ -217,41 +217,39 @@ def _get_philny(C, mag):
     return res
 
 
-def _get_shallow_site_response_term(SJ, C, vs30, pga_rock):
+def _get_linear_site_term(SJ, C, vs30):
+    vs_norm = vs30 / C["k1"]
+    le_k1 = vs30 <= C["k1"]
+    
+    f_site = le_k1 * C["c11"] * np.log(vs_norm)
+    f_site += ~le_k1 * (C["c11"] + C["k2"] * CONSTS["n"]) * np.log(vs_norm)
+
+    if SJ:
+        f_site += (C["c13"] + C["k2"] * CONSTS["n"]) * np.log(vs_norm)
+        # additional term activated for soft ctx (Vs30 <= 200m/s)
+        # in Japan data
+        le_200 = vs30 <= 200.0
+        f_site += le_200 * (C["c12"] + C["k2"] * CONSTS["n"]) * (np.log(vs_norm) - np.log(200.0 / C["k1"]))
+    return f_site
+
+
+def _get_nonlinear_site_term(C, vs30, pga_1100):
+    vs_norm = vs30 / C["k1"]
+    le_k1 = vs30 <= C["k1"]
+    f_site = np.zeros_like(vs30)
+    if np.any(le_k1):
+        f_site += le_k1 * C["k2"] * (np.log(pga_1100 + CONSTS["c"] * (vs_norm**CONSTS["n"])) - np.log(pga_1100 + CONSTS["c"]))
+    return f_site
+
+
+def _get_shallow_site_response_term(SJ, C, vs30, pga_1100):
     """
     Returns the shallow site response term defined in equations 17, 18 and
     19
     """
-    vs_mod = vs30 / C["k1"]
-    # Get linear global site response term
-    f_site_g = C["c11"] * np.log(vs_mod)
-    idx = vs30 > C["k1"]
-    f_site_g[idx] = f_site_g[idx] + (C["k2"] * CONSTS["n"] *
-                                     np.log(vs_mod[idx]))
-
-    # Get nonlinear site response term
-    idx = np.logical_not(idx)
-    if np.any(idx):
-        f_site_g[idx] = f_site_g[idx] + C["k2"] * (
-            np.log(pga_rock[idx] +
-                   CONSTS["c"] * (vs_mod[idx] ** CONSTS["n"])) -
-            np.log(pga_rock[idx] + CONSTS["c"]))
-
-    # For Japan (SJ = 1) further scaling is needed (equation 19)
-    if SJ:
-        fsite_j = (C["c13"] + C["k2"] * CONSTS["n"]) * \
-            np.log(vs_mod)
-        # additional term activated for soft ctx (Vs30 <= 200m/s)
-        # in Japan data
-        idx = vs30 <= 200.0
-        add_soft = (C["c12"] + C["k2"] * CONSTS["n"]) * \
-            (np.log(vs_mod) - np.log(200.0 / C["k1"]))
-        # combine terms
-        fsite_j[idx] += add_soft[idx]
-
-        return f_site_g + fsite_j
-    else:
-        return f_site_g
+    f_site = _get_linear_site_term(SJ, C, vs30)
+    f_site += _get_nonlinear_site_term(C, vs30, pga_1100)
+    return f_site
 
 
 def _get_style_of_faulting_term(C, ctx):
@@ -294,6 +292,21 @@ def _select_basin_model(SJ, vs30):
         return np.exp(7.089 - 1.144 * np.log(vs30))
 
 
+def get_mean_nosite(C, ctx):
+    """
+    Returns the mean values for a specific IMT without site terms.
+    """
+    return (
+        _get_magnitude_term(C, ctx.mag) +
+        _get_geometric_attenuation_term(C, ctx.mag, ctx.rrup) +
+        _get_style_of_faulting_term(C, ctx) +
+        _get_hanging_wall_term(C, ctx) +
+        _get_hypocentral_depth_term(C, ctx) +
+        _get_fault_dip_term(C, ctx) +
+        _get_anelastic_attenuation_term(C, ctx.rrup)
+        )
+
+
 def get_mean_values(SJ, C, ctx, a1100=None):
     """
     Returns the mean values for a specific IMT
@@ -308,15 +321,12 @@ def get_mean_values(SJ, C, ctx, a1100=None):
         temp_z2pt5 = _select_basin_model(SJ, 1100.0) * \
             np.ones_like(temp_vs30)
 
-    return (_get_magnitude_term(C, ctx.mag) +
-            _get_geometric_attenuation_term(C, ctx.mag, ctx.rrup) +
-            _get_style_of_faulting_term(C, ctx) +
-            _get_hanging_wall_term(C, ctx) +
-            _get_shallow_site_response_term(SJ, C, temp_vs30, a1100) +
-            _get_basin_response_term(SJ, C, temp_z2pt5) +
-            _get_hypocentral_depth_term(C, ctx) +
-            _get_fault_dip_term(C, ctx) +
-            _get_anelastic_attenuation_term(C, ctx.rrup))
+    mean = get_mean_nosite(C, ctx)
+    mean += (
+        _get_shallow_site_response_term(SJ, C, temp_vs30, a1100) +
+        _get_basin_response_term(SJ, C, temp_z2pt5)
+        )
+    return mean
 
 
 def _update_ctx(gsim, ctx):

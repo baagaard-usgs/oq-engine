@@ -242,6 +242,38 @@ def get_rupture_depth_scaling_term(C, trt, ctx):
     return f_dep
 
 
+def get_linear_site_term(C, region, vstar, vnorm):
+    """
+    Returns the linear shallow site amplification term as described in Equation 3.7.
+
+    :param dict C
+        Model coefficients
+    :param str region
+        Region for local adjustments
+    :param numpy.ndarray vnorm
+        Normalized Vs30 value
+    """
+    a12 = C["a12"]
+    if region != "GLO":
+        # Apply regional adjustment
+        a12 += C[REGIONAL_TERMS[region]["a12-adj"]]
+
+    fsite = a12 * np.log(vnorm)
+    idx = vstar >= C["vlin"]
+    fsite[idx] += (C["b"] * CONSTS["n"] * np.log(vnorm[idx]))
+    return fsite
+
+
+def get_nonlinear_site_term(C, vstar, vnorm, pga1000):
+    idx = vstar < C["vlin"]
+    fsite = np.zeros_like(vnorm)
+    fsite[idx] = C["b"] * (
+        np.log(pga1000[idx] + CONSTS["c"] * (vnorm[idx] ** CONSTS["n"])) -
+        np.log(pga1000[idx] + CONSTS["c"])
+        )
+    return fsite
+    
+
 def get_site_amplification_term(C, region, vs30, pga1000):
     """
     Returns the shallow site amplification term as descrbied in Equation 3.7,
@@ -252,24 +284,11 @@ def get_site_amplification_term(C, region, vs30, pga1000):
     :param numpy.ndarray pga1000:
         Peak Ground Acceleration (PGA), g, on a reference bedrock of 1000 m/s
     """
-    a12 = C["a12"]
-    if region != "GLO":
-        # Apply regional adjustment
-        a12 += C[REGIONAL_TERMS[region]["a12-adj"]]
-    # V* is defined according to Equation 3.8 (i.e. Vs30 clipped at 1000 m/s
-    # in the Erratum)
     vstar = np.clip(vs30, -np.inf, 1000.0)
     vnorm = vstar / C["vlin"]
-    fsite = a12 * np.log(vnorm)
-    idx = vstar >= C["vlin"]
-    # Linear site term
-    fsite[idx] += (C["b"] * CONSTS["n"] * np.log(vnorm[idx]))
-    idx = np.logical_not(idx)
-    # Nonlinear site term
-    fsite[idx] += C["b"] * (
-        np.log(pga1000[idx] + CONSTS["c"] * (vnorm[idx] ** CONSTS["n"])) -
-        np.log(pga1000[idx] + CONSTS["c"])
-        )
+
+    fsite = get_linear_site_term(C, region, vstar, vnorm)
+    fsite += get_nonlinear_site_term(C, vstar, vnorm, pga1000)
     return fsite
 
 
@@ -315,6 +334,18 @@ def get_basin_depth_scaling(C, region, vs30, z25):
     return f_basin
 
 
+def get_mean_acceleration_nosite(C, trt, region, ctx, apply_adjustment):
+    """
+    Returns acceleration without any site or basin terms.
+    """
+    return (get_base_term(C, region, apply_adjustment) +
+            get_magnitude_scaling_term(C, trt, region, ctx.mag) +
+            get_geometric_spreading_term(C, region, ctx.mag, ctx.rrup) +
+            get_anelastic_attenuation_term(C, region, ctx.rrup) +
+            get_rupture_depth_scaling_term(C, trt, ctx) +
+            get_inslab_scaling_term(C, trt, region, ctx.mag, ctx.rrup))
+
+
 def get_acceleration_on_reference_rock(C, trt, region, ctx, apply_adjustment):
     """
     Returns acceleration on reference rock - intended for use primarily with
@@ -325,14 +356,12 @@ def get_acceleration_on_reference_rock(C, trt, region, ctx, apply_adjustment):
     # On rock the amplification is only linear, so PGA1000 is not used
     # set to a null array
     null_pga1000 = np.zeros(vs30.shape)
+
     # No basin depth is calculated here
-    return (get_base_term(C, region, apply_adjustment) +
-            get_magnitude_scaling_term(C, trt, region, ctx.mag) +
-            get_geometric_spreading_term(C, region, ctx.mag, ctx.rrup) +
-            get_anelastic_attenuation_term(C, region, ctx.rrup) +
-            get_rupture_depth_scaling_term(C, trt, ctx) +
-            get_inslab_scaling_term(C, trt, region, ctx.mag, ctx.rrup) +
-            get_site_amplification_term(C, region, vs30, null_pga1000))
+    return (
+        get_mean_acceleration_nosite(C, trt, region, ctx, apply_adjustment) +
+        get_site_amplification_term(C, region, vs30, null_pga1000)
+        )
 
 
 def get_mean_acceleration(C, trt, region, ctx, pga1000, apply_adjustment):
@@ -346,14 +375,11 @@ def get_mean_acceleration(C, trt, region, ctx, pga1000, apply_adjustment):
         # Basin depths will be ignored, so set zeros
         z25 = np.zeros(ctx.vs30.shape)
 
-    return (get_base_term(C, region, apply_adjustment) +
-            get_magnitude_scaling_term(C, trt, region, ctx.mag) +
-            get_geometric_spreading_term(C, region, ctx.mag, ctx.rrup) +
-            get_anelastic_attenuation_term(C, region, ctx.rrup) +
-            get_rupture_depth_scaling_term(C, trt, ctx) +
-            get_inslab_scaling_term(C, trt, region, ctx.mag, ctx.rrup) +
-            get_site_amplification_term(C, region, ctx.vs30, pga1000) +
-            get_basin_depth_scaling(C, region, ctx.vs30, z25))
+    return (
+        get_mean_acceleration_nosite(C, trt, region, ctx, apply_adjustment) +
+        get_site_amplification_term(C, region, ctx.vs30, pga1000) +
+        get_basin_depth_scaling(C, region, ctx.vs30, z25)
+        )
 
 
 def _get_f2(t1, t2, t3, t4, alpha, period):
@@ -634,8 +660,7 @@ class AbrahamsonGulerce2020SInter(GMPE):
         self.sigma_mu_epsilon = sigma_mu_epsilon
         # If running for Cascadia or Japan then z2.5 is needed
         if region in ("CAS", "JPN"):
-            self.REQUIRES_SITES_PARAMETERS = \
-                self.REQUIRES_SITES_PARAMETERS.union({"z2pt5", })
+            self.REQUIRES_SITES_PARAMETERS |= {"z2pt5"}
 
     def compute(self, ctx: np.recarray, imts, mean, sig, tau, phi):
         """

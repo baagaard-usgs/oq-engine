@@ -357,6 +357,27 @@ def get_depth_term(C, trt, ztor):
                       CONSTS["c_10"], CONSTS["delta_z"])
 
 
+def get_linear_site_term(C, region, vs30):
+    # c7 is the same for interface or inslab - so just read from interface
+    c_7 = C[REGION_TERMS_IF[region]["c7"]]
+    # Get linear site term
+    vs_mod = vs30 / C["k1"]
+    f_site_g = c_7 * np.log(vs_mod)
+    idx = vs30 > C["k1"]
+    f_site_g[idx] = f_site_g[idx] + (C["k2"] * CONSTS["n"] *
+                                     np.log(vs_mod[idx]))
+    return f_site_g
+    
+def get_nonlinear_site_term(C, region, vs30, pga1100):
+    f_site_g = np.zeros_like(vs30)
+    idx = vs30 < C["k1"]
+    if np.any(idx):
+        vs_mod = vs30 / C["k1"]
+        f_site_g[idx] += C["k2"] * (
+                np.log(pga1100[idx] + CONSTS["c"] * (vs_mod[idx]**CONSTS["n"])) -
+                np.log(pga1100[idx] + CONSTS["c"]))
+    return f_site_g
+
 def get_shallow_site_response_term(C, region, vs30, pga1100):
     """
     Returns the shallow site response term in Eq. 4.8
@@ -367,24 +388,9 @@ def get_shallow_site_response_term(C, region, vs30, pga1100):
     :param numpy ndarray pga1100:
         Peak ground acceleration on reference rock (Vs30 1100 m/s)
     """
-    # c7 is the same for interface or inslab - so just read from interface
-    c_7 = C[REGION_TERMS_IF[region]["c7"]]
-    # Get linear site term
-    vs_mod = vs30 / C["k1"]
-    f_site_g = c_7 * np.log(vs_mod)
-    idx = vs30 > C["k1"]
-    f_site_g[idx] = f_site_g[idx] + (C["k2"] * CONSTS["n"] *
-                                     np.log(vs_mod[idx]))
-
-    # Get nonlinear site response term
-    idx = np.logical_not(idx)
-    if np.any(idx):
-        f_site_g[idx] = f_site_g[idx] + C["k2"] * (
-                np.log(pga1100[idx] +
-                       CONSTS["c"] * (vs_mod[idx] ** CONSTS["n"])) -
-                np.log(pga1100[idx] + CONSTS["c"])
-        )
-    return f_site_g
+    fsite = get_linear_site_term(C, region, vs30)
+    fsite += get_nonlinear_site_term(C, region, vs30, pga1100)
+    return fsite
 
 
 def _get_ln_z_ref(CZ, vs30):
@@ -426,6 +432,22 @@ def get_basin_response_term(C, region, vs30, z_value):
     return brt
 
 
+def get_mean_values_nosite(C, region, trt, m_b, ctx):
+    """
+    Returns the mean ground values for a specific IMT
+
+    :param float m_b:
+        Magnitude scaling breakpoint
+    """
+    return (
+        get_base_term(C, trt, region) +
+        get_magnitude_scaling_term(C, trt, m_b, ctx.mag) +
+        get_geometric_attenuation_term(C, trt, ctx.mag, ctx.rrup) +
+        get_anelastic_attenuation_term(C, trt, region, ctx.rrup) +
+        get_depth_term(C, trt, ctx.ztor)
+        )
+    
+
 def get_mean_values(C, region, trt, m_b, ctx, a1100=None):
     """
     Returns the mean ground values for a specific IMT
@@ -433,6 +455,8 @@ def get_mean_values(C, region, trt, m_b, ctx, a1100=None):
     :param float m_b:
         Magnitude scaling breakpoint
     """
+    mean = get_mean_values_nosite(C, region, trt, m_b, ctx)
+
     if a1100 is None:
         # Refers to the reference rock case - so Vs30 is 1100 and no a1100
         # is defined
@@ -447,13 +471,7 @@ def get_mean_values(C, region, trt, m_b, ctx, a1100=None):
             z_values = ctx.z1pt0.copy()
         else:
             z_values = np.zeros(vs30.shape)
-    # Get the mean ground motions
-    mean = (get_base_term(C, trt, region) +
-            get_magnitude_scaling_term(C, trt, m_b, ctx.mag) +
-            get_geometric_attenuation_term(C, trt, ctx.mag, ctx.rrup) +
-            get_anelastic_attenuation_term(C, trt, region, ctx.rrup) +
-            get_depth_term(C, trt, ctx.ztor) +
-            get_shallow_site_response_term(C, region, vs30, a1100))
+    mean += get_shallow_site_response_term(C, region, vs30, a1100)
 
     # For Cascadia, Japan, New Zealand and Taiwan a basin depth term
     # is included
@@ -673,12 +691,10 @@ class KuehnEtAl2020SInter(GMPE):
         assert region in SUPPORTED_REGIONS, "Region %s not defined for %s" %\
             (region, self.__class__.__name__)
         self.region = region
-
         # For some regions a basin depth term is defined
         if self.region in ("CAS", "JPN"):
             # If region is CAS or JPN then the GMPE needs Z2.5
-            self.REQUIRES_SITES_PARAMETERS = \
-                 self.REQUIRES_SITES_PARAMETERS.union({"z2pt5", })
+            self.REQUIRES_SITES_PARAMETERS |= {"z2pt5"}
         elif self.region in ("NZL", "TWN"):
             # If region is NZL or TWN then the GMPE needs Z1.0
             self.REQUIRES_SITES_PARAMETERS |= {"z1pt0"}

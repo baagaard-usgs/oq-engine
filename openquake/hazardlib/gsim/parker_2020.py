@@ -32,8 +32,14 @@ from openquake.hazardlib import const
 from openquake.hazardlib.gsim.base import GMPE, CoeffsTable, add_alias
 from openquake.hazardlib.imt import PGA, SA, PGV
 
-CONSTANTS = {"b4": 0.1, "f3": 0.05, "Vb": 200,
-             "vref_fnl": 760, "V1": 270, "vref": 760}
+CONSTANTS = {
+    "b4": 0.1,
+    "f3": 0.05,
+    "Vb": 200,
+    "vref_fnl": 760,
+    "V1": 270,
+    "vref": 760,
+    }
 
 _a0 = CallableDict()
 
