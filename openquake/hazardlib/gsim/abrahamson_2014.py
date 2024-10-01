@@ -402,10 +402,6 @@ def _get_sa_at_1180(region, C, imt, ctx):
 
 
 def get_mean_nosite(C, imt, ctx):
-    f1 = _get_basic_term(C, ctx)
-    f2 = _get_faulting_style_term(C, ctx)
-    f3 = _get_hanging_wall_term(C, ctx)
-    f4 = _get_top_of_rupture_depth_term(C, imt, ctx)
     return (_get_basic_term(C, ctx) +
             _get_faulting_style_term(C, ctx) +
             _get_hanging_wall_term(C, ctx) +
