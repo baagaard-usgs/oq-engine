@@ -23,6 +23,7 @@ Module exports :class:`AbrahamsonGulerce2022SInter`,
 """
 from openquake.hazardlib.gsim.base import GMPE, CoeffsTable, add_alias
 from openquake.hazardlib.gsim import abrahamson_gulerce_2020
+from openquake.hazardlib.gsim.abrahamson_gulerce_2020 import (SUPPORTED_REGIONS, REGION_ALIASES)
 
 
 # Coefficients taken from Earthquake Spectra electronic supplement.

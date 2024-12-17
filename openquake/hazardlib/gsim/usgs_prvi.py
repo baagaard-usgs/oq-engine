@@ -19,7 +19,9 @@ from openquake.hazardlib.gsim import (
     boore_2014,
     campbell_bozorgnia_2014,
     chiou_youngs_2014,
+    cauzzi_2014,
     abrahamson_gulerce_2020,
+    abrahamson_gulerce_2022,
     kuehn_2020,
     parker_2020,
     )
@@ -169,7 +171,30 @@ class ChiouYoungs2014_NoSiteResp(chiou_youngs_2014.ChiouYoungs2014):
 
 
     
-class AbrahamsonGulerce2020SInter_NoSiteResp(abrahamson_gulerce_2020.AbrahamsonGulerce2020SInter):
+class CauzziEtAl2014_NoSiteResp(cauzzi_2014.CauzziEtAl2014):
+    """
+    Implements active crustal GMM developed by Cauzzi without site response.
+    """
+
+    def __init__(self, sigma_mu_epsilon=0.0, **kwargs):
+        super().__init__(sigma_mu_epsilon=sigma_mu_epsilon, **kwargs)
+        self.REQIURES_SITES_PARAMETERS = {}
+
+    def compute(self, ctx: numpy.recarray, imts, mean, sig, tau, phi):
+        """
+        See :meth:`superclass method
+        <.base.GroundShakingIntensityModel.compute>`
+        for spec of input and result values.
+        """
+        for m, imt in enumerate(imts):
+            C = self.COEFFS[imt]
+            mean[m] = cauzzi_2014._compute_mean_nosite(
+                self.__class__.__name__, self.sof, self.adjustment_factor,
+                C, ctx, imt)
+            sig[m], tau[m], phi[m] = cauzzi_2014._get_stddevs(self.sof, C)
+
+        
+class AbrahamsonGulerce2022SInter_NoSiteResp(abrahamson_gulerce_2022.AbrahamsonGulerce2022SInter):
     """
     Implements the 2020 Subduction ground motion model of Abrahamson &
     Gulerce (2020) GMM without site response.
@@ -205,7 +230,7 @@ class AbrahamsonGulerce2020SInter_NoSiteResp(abrahamson_gulerce_2020.AbrahamsonG
         sig += numpy.sqrt(tau ** 2.0 + phi ** 2.0)
 
 
-class AbrahamsonGulerce2020SSlab_NoSiteResp(AbrahamsonGulerce2020SInter_NoSiteResp):
+class AbrahamsonGulerce2022SSlab_NoSiteResp(AbrahamsonGulerce2022SInter_NoSiteResp):
     """
     Implements the 2020 Subduction ground motion model of Abrahamson &
     Gulerce (2020) GMM without site response.
@@ -217,12 +242,12 @@ class AbrahamsonGulerce2020SSlab_NoSiteResp(AbrahamsonGulerce2020SInter_NoSiteRe
     DEFINED_FOR_TECTONIC_REGION_TYPE = const.TRT.SUBDUCTION_INTRASLAB
 
 
-for region in abrahamson_gulerce_2020.SUPPORTED_REGIONS[1:]:
-    add_alias("AbrahamsonGulerce2020SInter" + abrahamson_gulerce_2020.REGION_ALIASES[region] + "_NoSiteResp",
-              AbrahamsonGulerce2020SInter_NoSiteResp,
+for region in abrahamson_gulerce_2022.SUPPORTED_REGIONS[1:]:
+    add_alias("AbrahamsonGulerce2022SInter" + abrahamson_gulerce_2022.REGION_ALIASES[region] + "_NoSiteResp",
+              AbrahamsonGulerce2022SInter_NoSiteResp,
               region=region)
-    add_alias("AbrahamsonGulerce2020SSlab" + abrahamson_gulerce_2020.REGION_ALIASES[region] + "_NoSiteResp",
-              AbrahamsonGulerce2020SSlab_NoSiteResp,
+    add_alias("AbrahamsonGulerce2022SSlab" + abrahamson_gulerce_2022.REGION_ALIASES[region] + "_NoSiteResp",
+              AbrahamsonGulerce2022SSlab_NoSiteResp,
               region=region)
 
 
@@ -406,18 +431,27 @@ class ChiouYoungs2014_USGSPRVI(chiou_youngs_2014.ChiouYoungs2014):
         COEFFS = CoeffsTable(sa_damping=5, table=f.read())
 
 
-class AbrahamsonGulerce2020SInter_USGSPRVI(abrahamson_gulerce_2020.AbrahamsonGulerce2020SInter):
+class CauzziEtAl2014_USGSPRVI(cauzzi_2014.CauzziEtAl2014):
     """
-    Abrahamson and Gulerce (2020) subduction interface ground-motion model with 
+    Cauzzi et al. (2014) active crustal ground-motion model with 
     USGS adjustments for Puerto Rico and the Virgin Islands.
     """
-    filename = pathlib.Path(__file__).parent / "AbrahamsonGulerce2020_USGSPRVI_coeffs.csv"
+    filename = pathlib.Path(__file__).parent / "CauzziEtAl2014_USGSPRVI_coeffs.csv"
     with open(filename) as f:
         COEFFS = CoeffsTable(sa_damping=5, table=f.read())
 
 
+class AbrahamsonGulerce2022SInter_USGSPRVI(abrahamson_gulerce_2022.AbrahamsonGulerce2022SInter):
+    """
+    Abrahamson and Gulerce (2020) subduction interface ground-motion model with 
+    USGS adjustments for Puerto Rico and the Virgin Islands.
+    """
+    filename = pathlib.Path(__file__).parent / "AbrahamsonGulerce2022_USGSPRVI_coeffs.csv"
+    with open(filename) as f:
+        COEFFS = CoeffsTable(sa_damping=5, table=f.read())
 
-class AbrahamsonGulerce2020SSlab_USGSPRVI(AbrahamsonGulerce2020SInter_USGSPRVI):
+
+class AbrahamsonGulerce2022SSlab_USGSPRVI(AbrahamsonGulerce2022SInter_USGSPRVI):
     """
     Implements the 2020 subduction intraslab ground motion model of Abrahamson &
     Gulerce (2020) GMM without site response.
@@ -477,23 +511,23 @@ class ParkerEtAl2020SSlab_USGSPRVI(ParkerEtAl2020SInter_USGSPRVI):
 
 
 
-class AdjustedGMM:
+class AdjustedOrigGMM:
     """
-    Add USGS period-independent adjustment to ground-motion models for Puerto Rico and the Virgin Islands.
+    USGS period-independent adjustment to ground-motion models for Puerto Rico and the Virgin Islands.
     """
-
     ACTIVE_CRUSTAL_MEAN_ADJUSTMENT = -0.3
     SUBDUCTION_MEAN_ADJUSTMENT = -0.4
 
-class AbrahamsonEtAl2014_USGSPRVIAdj(AbrahamsonEtAl2014_USGSPRVI):
-    """
-    Abrahamson et al. (2014) active crustal ground-motion model with 
-    USGS adjustments for Puerto Rico and the Virgin Islands.
+
+class AbrahamsonEtAl2014_USGSAdj(abrahamson_2014.AbrahamsonEtAl2014):
+    """Abrahamson et al. (2014) active crustal ground-motion model with
+    USGS period-independent adjustments for Puerto Rico and the Virgin
+    Islands.
     """
     
     def __init__(self, sigma_mu_epsilon = 0.0, **kwargs):
         super().__init__(sigma_mu_epsilon=sigma_mu_epsilon, **kwargs)
-        self.mean_adjustment = AdjustedGMM.ACTIVE_CRUSTAL_MEAN_ADJUSTMENT
+        self.mean_adjustment = AdjustedOrigGMM.ACTIVE_CRUSTAL_MEAN_ADJUSTMENT
 
     def compute(self, ctx: numpy.recarray, imts, mean, sig, tau, phi):
         """
@@ -503,15 +537,15 @@ class AbrahamsonEtAl2014_USGSPRVIAdj(AbrahamsonEtAl2014_USGSPRVI):
         mean += self.mean_adjustment
 
 
-class BooreEtAl2014_USGSPRVIAdj(BooreEtAl2014_USGSPRVI):
+class BooreEtAl2014_USGSAdj(boore_2014.BooreEtAl2014):
     """
     Boore et al. (2014) active crustal ground-motion model with 
-    USGS adjustments for Puerto Rico and the Virgin Islands.
+    USGS period-independent adjustments for Puerto Rico and the Virgin Islands.
     """
     
     def __init__(self, sigma_mu_epsilon = 0.0, **kwargs):
         super().__init__(sigma_mu_epsilon=sigma_mu_epsilon, **kwargs)
-        self.mean_adjustment = AdjustedGMM.ACTIVE_CRUSTAL_MEAN_ADJUSTMENT
+        self.mean_adjustment = AdjustedOrigGMM.ACTIVE_CRUSTAL_MEAN_ADJUSTMENT
 
     def compute(self, ctx: numpy.recarray, imts, mean, sig, tau, phi):
         """
@@ -521,15 +555,15 @@ class BooreEtAl2014_USGSPRVIAdj(BooreEtAl2014_USGSPRVI):
         mean += self.mean_adjustment
     
 
-class CampbellBozorgnia2014_USGSPRVIAdj(CampbellBozorgnia2014_USGSPRVI):
+class CampbellBozorgnia2014_USGSAdj(campbell_bozorgnia_2014.CampbellBozorgnia2014):
     """
     Campbell and Bozorgnia (2014) active crustal ground-motion model with 
-    USGS adjustments for Puerto Rico and the Virgin Islands.
+    USGS period-independent adjustments for Puerto Rico and the Virgin Islands.
     """
     
     def __init__(self, sigma_mu_epsilon = 0.0, **kwargs):
         super().__init__(sigma_mu_epsilon=sigma_mu_epsilon, **kwargs)
-        self.mean_adjustment = AdjustedGMM.ACTIVE_CRUSTAL_MEAN_ADJUSTMENT
+        self.mean_adjustment = AdjustedOrigGMM.ACTIVE_CRUSTAL_MEAN_ADJUSTMENT
 
     def compute(self, ctx: numpy.recarray, imts, mean, sig, tau, phi):
         """
@@ -539,15 +573,15 @@ class CampbellBozorgnia2014_USGSPRVIAdj(CampbellBozorgnia2014_USGSPRVI):
         mean += self.mean_adjustment
     
 
-class ChiouYoungs2014_USGSPRVIAdj(ChiouYoungs2014_USGSPRVI):
+class ChiouYoungs2014_USGSAdj(chiou_youngs_2014.ChiouYoungs2014):
     """
     Chiou and Youngs (2014) active crustal ground-motion model with 
-    USGS adjustments for Puerto Rico and the Virgin Islands.
+    USGS period-independent adjustments for Puerto Rico and the Virgin Islands.
     """
     
     def __init__(self, sigma_mu_epsilon = 0.0, **kwargs):
         super().__init__(sigma_mu_epsilon=sigma_mu_epsilon, **kwargs)
-        self.mean_adjustment = AdjustedGMM.ACTIVE_CRUSTAL_MEAN_ADJUSTMENT
+        self.mean_adjustment = AdjustedOrigGMM.ACTIVE_CRUSTAL_MEAN_ADJUSTMENT
 
     def compute(self, ctx: numpy.recarray, imts, mean, sig, tau, phi):
         """
@@ -557,15 +591,15 @@ class ChiouYoungs2014_USGSPRVIAdj(ChiouYoungs2014_USGSPRVI):
         mean += self.mean_adjustment
     
 
-class AbrahamsonGulerce2020SInter_USGSPRVIAdj(AbrahamsonGulerce2020SInter_USGSPRVI):
+class AbrahamsonGulerce2022SInter_USGSAdj(abrahamson_gulerce_2022.AbrahamsonGulerce2022SInter):
     """
     Abrahamson and Gulerce (2020) subduction interface ground-motion model with 
-    USGS adjustments for Puerto Rico and the Virgin Islands.
+    USGS period-independent adjustments for Puerto Rico and the Virgin Islands.
     """
     
     def __init__(self, sigma_mu_epsilon = 0.0, **kwargs):
         super().__init__(sigma_mu_epsilon=sigma_mu_epsilon, **kwargs)
-        self.mean_adjustment = AdjustedGMM.SUBDUCTION_MEAN_ADJUSTMENT
+        self.mean_adjustment = AdjustedOrigGMM.SUBDUCTION_MEAN_ADJUSTMENT
 
     def compute(self, ctx: numpy.recarray, imts, mean, sig, tau, phi):
         """
@@ -575,15 +609,15 @@ class AbrahamsonGulerce2020SInter_USGSPRVIAdj(AbrahamsonGulerce2020SInter_USGSPR
         mean += self.mean_adjustment
 
 
-class AbrahamsonGulerce2020SSlab_USGSPRVIAdj(AbrahamsonGulerce2020SSlab_USGSPRVI):
+class AbrahamsonGulerce2022SSlab_USGSAdj(abrahamson_gulerce_2022.AbrahamsonGulerce2022SSlab):
     """
     Abrahamson and Gulerce (2020) subduction intraslab ground-motion model with 
-    USGS adjustments for Puerto Rico and the Virgin Islands.
+    USGS period-independent adjustments for Puerto Rico and the Virgin Islands.
     """
     
     def __init__(self, sigma_mu_epsilon = 0.0, **kwargs):
         super().__init__(sigma_mu_epsilon=sigma_mu_epsilon, **kwargs)
-        self.mean_adjustment = AdjustedGMM.SUBDUCTION_MEAN_ADJUSTMENT
+        self.mean_adjustment = AdjustedOrigGMM.SUBDUCTION_MEAN_ADJUSTMENT
 
     def compute(self, ctx: numpy.recarray, imts, mean, sig, tau, phi):
         """
@@ -593,15 +627,15 @@ class AbrahamsonGulerce2020SSlab_USGSPRVIAdj(AbrahamsonGulerce2020SSlab_USGSPRVI
         mean += self.mean_adjustment
 
 
-class KuehnEtAl2020SInter_USGSPRVIAdj(KuehnEtAl2020SInter_USGSPRVI):
+class KuehnEtAl2020SInter_USGSAdj(kuehn_2020.KuehnEtAl2020SInter):
     """
     Kuehn et al. (2020) subduction interface ground-motion model with 
-    USGS adjustments for Puerto Rico and the Virgin Islands.
+    USGS period-independent adjustments for Puerto Rico and the Virgin Islands.
     """
     
     def __init__(self, sigma_mu_epsilon = 0.0, **kwargs):
         super().__init__(sigma_mu_epsilon=sigma_mu_epsilon, **kwargs)
-        self.mean_adjustment = AdjustedGMM.SUBDUCTION_MEAN_ADJUSTMENT
+        self.mean_adjustment = AdjustedOrigGMM.SUBDUCTION_MEAN_ADJUSTMENT
 
     def compute(self, ctx: numpy.recarray, imts, mean, sig, tau, phi):
         """
@@ -611,15 +645,15 @@ class KuehnEtAl2020SInter_USGSPRVIAdj(KuehnEtAl2020SInter_USGSPRVI):
         mean += self.mean_adjustment
 
 
-class KuehnEtAl2020SSlab_USGSPRVIAdj(KuehnEtAl2020SSlab_USGSPRVI):
+class KuehnEtAl2020SSlab_USGSAdj(kuehn_2020.KuehnEtAl2020SSlab):
     """
     Kuehn et al. (2020) subduction intraslab ground-motion model with 
-    USGS adjustments for Puerto Rico and the Virgin Islands.
+    USGS period-independent adjustments for Puerto Rico and the Virgin Islands.
     """
     
     def __init__(self, sigma_mu_epsilon = 0.0, **kwargs):
         super().__init__(sigma_mu_epsilon=sigma_mu_epsilon, **kwargs)
-        self.mean_adjustment = AdjustedGMM.SUBDUCTION_MEAN_ADJUSTMENT
+        self.mean_adjustment = AdjustedOrigGMM.SUBDUCTION_MEAN_ADJUSTMENT
 
     def compute(self, ctx: numpy.recarray, imts, mean, sig, tau, phi):
         """
@@ -629,15 +663,15 @@ class KuehnEtAl2020SSlab_USGSPRVIAdj(KuehnEtAl2020SSlab_USGSPRVI):
         mean += self.mean_adjustment
 
 
-class ParkerEtAl2020SInter_USGSPRVIAdj(ParkerEtAl2020SInter_USGSPRVI):
+class ParkerEtAl2020SInter_USGSAdj(parker_2020.ParkerEtAl2020SInter):
     """
     Parker et al. (2020) subduction interface ground-motion model with 
-    USGS adjustments for Puerto Rico and the Virgin Islands.
+    USGS period-independent adjustments for Puerto Rico and the Virgin Islands.
     """
     
     def __init__(self, sigma_mu_epsilon = 0.0, **kwargs):
         super().__init__(sigma_mu_epsilon=sigma_mu_epsilon, **kwargs)
-        self.mean_adjustment = AdjustedGMM.SUBDUCTION_MEAN_ADJUSTMENT
+        self.mean_adjustment = AdjustedOrigGMM.SUBDUCTION_MEAN_ADJUSTMENT
 
     def compute(self, ctx: numpy.recarray, imts, mean, sig, tau, phi):
         """
@@ -647,15 +681,15 @@ class ParkerEtAl2020SInter_USGSPRVIAdj(ParkerEtAl2020SInter_USGSPRVI):
         mean += self.mean_adjustment
 
 
-class ParkerEtAl2020SSlab_USGSPRVIAdj(ParkerEtAl2020SSlab_USGSPRVI):
+class ParkerEtAl2020SSlab_USGSAdj(parker_2020.ParkerEtAl2020SSlab):
     """
     Parker et al. (2020) subduction intraslab ground-motion model with 
-    USGS adjustments for Puerto Rico and the Virgin Islands.
+    USGS period-independent adjustments for Puerto Rico and the Virgin Islands.
     """
     
     def __init__(self, sigma_mu_epsilon = 0.0, **kwargs):
         super().__init__(sigma_mu_epsilon=sigma_mu_epsilon, **kwargs)
-        self.mean_adjustment = AdjustedGMM.SUBDUCTION_MEAN_ADJUSTMENT
+        self.mean_adjustment = AdjustedOrigGMM.SUBDUCTION_MEAN_ADJUSTMENT
 
     def compute(self, ctx: numpy.recarray, imts, mean, sig, tau, phi):
         """
