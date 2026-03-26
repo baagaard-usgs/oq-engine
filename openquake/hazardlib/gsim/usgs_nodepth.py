@@ -16,20 +16,20 @@ from openquake.hazardlib.gsim import (
     )
 
 
-class AbrahamsonGulerce2022SInter_USGSGuam(abrahamson_gulerce_2022.AbrahamsonGulerce2022SInter):
+class AbrahamsonGulerce2022SInter_NoDepth(abrahamson_gulerce_2022.AbrahamsonGulerce2022SInter):
     """
     Abrahamson and Gulerce (2020) subduction interface ground-motion model with 
-    USGS adjustments for Guam and the Northern Mariana Islands.
+    no depth scaling.
     """
-    filename = pathlib.Path(__file__).parent / "AbrahamsonGulerce2022_USGSGuam_coeffs.csv"
+    filename = pathlib.Path(__file__).parent / "AbrahamsonGulerce2022_NoDepth_coeffs.csv"
     with open(filename, encoding="utf-8") as f:
         COEFFS = CoeffsTable(sa_damping=5, table=f.read())
 
 
-class AbrahamsonGulerce2022SSlab_USGSGuam(AbrahamsonGulerce2022SInter_USGSGuam):
+class AbrahamsonGulerce2022SSlab_NoDepth(AbrahamsonGulerce2022SInter_NoDepth):
     """
     Abrahamson and Gulerce (2020) subduction intraslab ground-motion model with 
-    USGS adjustments for Guam and the Northern Mariana Islands.
+    no depth scaling.
     """
     #: Required rupture parameters are magnitude and top-of-rupture depth
     REQUIRES_RUPTURE_PARAMETERS = {'mag', 'ztor'}
@@ -38,39 +38,38 @@ class AbrahamsonGulerce2022SSlab_USGSGuam(AbrahamsonGulerce2022SInter_USGSGuam):
     DEFINED_FOR_TECTONIC_REGION_TYPE = const.TRT.SUBDUCTION_INTRASLAB
 
 
-class KuehnEtAl2020SInter_USGSGuam(kuehn_2020.KuehnEtAl2020SInter):
+class KuehnEtAl2020SInter_NoDepth(kuehn_2020.KuehnEtAl2020SInter):
     """
     Kuehn et al. (2020) subduction interface ground-motion model with 
-    USGS adjustments for Guam and the Northern Mariana Islands.
+    no depth scaling.
     """
-    filename = pathlib.Path(__file__).parent / "KuehnEtAl2020_USGSGuam_coeffs.csv"
+    filename = pathlib.Path(__file__).parent / "KuehnEtAl2020_NoDepth_coeffs.csv"
     with open(filename, encoding="utf-8") as f:
         COEFFS = CoeffsTable(sa_damping=5, table=f.read())
 
 
-class KuehnEtAl2020SSlab_USGSGuam(KuehnEtAl2020SInter_USGSGuam):
+class KuehnEtAl2020SSlab_NoDepth(KuehnEtAl2020SInter_NoDepth):
     """
     Kuehn et al. (2020) subduction intraslab ground-motion model with 
-    USGS adjustments for Guam and the Northern Mariana Islands.
+    no depth scaling.
     """
     #: Supported tectonic region type is subduction inslab
     DEFINED_FOR_TECTONIC_REGION_TYPE = const.TRT.SUBDUCTION_INTRASLAB
 
 
-class ParkerEtAl2020SInter_USGSGuam(parker_2020.ParkerEtAl2020SInter):
+class ParkerEtAl2020SInter_NoDepth(parker_2020.ParkerEtAl2020SInter):
     """
     Parker et al. (2020) subduction interface ground-motion model with 
-    USGS adjustments for Guam and the Northern Mariana Islands.
+    no depth scaling.
     """
-    filename = pathlib.Path(__file__).parent / "ParkerEtAl2020_USGSGuam_coeffs.csv"
+    filename = pathlib.Path(__file__).parent / "ParkerEtAl2020_NoDepth_coeffs.csv"
     with open(filename, encoding="utf-8") as f:
         COEFFS = CoeffsTable(sa_damping=5, table=f.read())
     
 
-class ParkerEtAl2020SSlab_USGSGuam(ParkerEtAl2020SInter_USGSGuam):
+class ParkerEtAl2020SSlab_NoDepth(ParkerEtAl2020SInter_NoDepth):
     """
-    Parker et al. (2020) subduction intraslab ground-motion model with 
-    USGS adjustments for Guam and the Northern Mariana Islands.
+    Modifications for subduction slab.
     """
     DEFINED_FOR_TECTONIC_REGION_TYPE = const.TRT.SUBDUCTION_INTRASLAB
 
