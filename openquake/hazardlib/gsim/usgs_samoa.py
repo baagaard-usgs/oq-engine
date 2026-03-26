@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-USGS adjustments to ground-motion models for Samoa and the Northern Mariana Islands.
+USGS adjustments to ground-motion models for American Samoa.
 
 
 """

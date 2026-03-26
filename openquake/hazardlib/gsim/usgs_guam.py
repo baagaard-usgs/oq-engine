@@ -60,7 +60,7 @@ class KuehnEtAl2020SSlab_USGSGuam(KuehnEtAl2020SInter_USGSGuam):
 class ParkerEtAl2020SInter_USGSGuam(parker_2020.ParkerEtAl2020SInter):
     """
     Parker et al. (2020) subduction interface ground-motion model with 
-    USGS adjustments for Puerto Rico and the Virgin Islands.
+    USGS adjustments for Guam and the Northern Mariana Islands.
     """
     filename = pathlib.Path(__file__).parent / "ParkerEtAl2020_USGSGuam_coeffs.csv"
     with open(filename, encoding="utf-8") as f:
@@ -69,7 +69,8 @@ class ParkerEtAl2020SInter_USGSGuam(parker_2020.ParkerEtAl2020SInter):
 
 class ParkerEtAl2020SSlab_USGSGuam(ParkerEtAl2020SInter_USGSGuam):
     """
-    Modifications for subduction slab.
+    Parker et al. (2020) subduction intraslab ground-motion model with 
+    USGS adjustments for Guam and the Northern Mariana Islands.
     """
     DEFINED_FOR_TECTONIC_REGION_TYPE = const.TRT.SUBDUCTION_INTRASLAB
 
@@ -83,4 +84,3 @@ class ParkerEtAl2020SSlab_USGSGuam(ParkerEtAl2020SInter_USGSGuam):
                   "CAM_S": 7.6, "CAM_N": 7.4, "JP_Pac": 7.65, "JP_Phi": 7.55,
                   "SA_N": 7.3, "SA_S": 7.25, "TW_W": 7.7, "TW_E": 7.7,
                   "default": 7.6}
-
