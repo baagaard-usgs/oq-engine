@@ -71,20 +71,20 @@ def _load_coeffs(name):
         return CoeffsTable(sa_damping=5, table=f.read())
 
 
-class AbrahamsonGulerce2022SInter_USGSGuamStage0(abrahamson_gulerce_2022.AbrahamsonGulerce2022SInter):
+class AbrahamsonGulerce2022SInter_USGSGNMIStage0(abrahamson_gulerce_2022.AbrahamsonGulerce2022SInter):
     """
     Abrahamson and Gulerce (2020) subduction interface ground-motion model with 
     USGS adjustments for Guam and the Northern Mariana Islands.
     """
-    COEFFS = _load_coeffs("AbrahamsonGulerce2022_USGSGuamStage0_coeffs.csv")
+    COEFFS = _load_coeffs("AbrahamsonGulerce2022_USGSGNMIStage0_coeffs.csv")
 
 
-class AbrahamsonGulerce2022SSlab_USGSGuamStage0(abrahamson_gulerce_2022.AbrahamsonGulerce2022SSlab):
+class AbrahamsonGulerce2022SSlab_USGSGNMIStage0(abrahamson_gulerce_2022.AbrahamsonGulerce2022SSlab):
     """
     Abrahamson and Gulerce (2020) subduction intraslab ground-motion model with 
     USGS adjustments for Guam and the Northern Mariana Islands.
     """
-    COEFFS = _load_coeffs("AbrahamsonGulerce2022_USGSGuamStage0_coeffs.csv")
+    COEFFS = _load_coeffs("AbrahamsonGulerce2022_USGSGNMIStage0_coeffs.csv")
 
     def compute(self, ctx: np.recarray, imts, mean, sig, tau, phi):
         """
@@ -118,52 +118,52 @@ class AbrahamsonGulerce2022SSlab_USGSGuamStage0(abrahamson_gulerce_2022.Abrahams
         sig += np.sqrt(tau ** 2.0 + phi ** 2.0)
 
 
-class AbrahamsonGulerce2022SInter_USGSGuamStage1(AbrahamsonGulerce2022SInter_USGSGuamStage0):
+class AbrahamsonGulerce2022SInter_USGSGNMIStage1(AbrahamsonGulerce2022SInter_USGSGNMIStage0):
     """
     Abrahamson and Gulerce (2020) subduction interface ground-motion model with 
     USGS adjustments for Guam and the Northern Mariana Islands.
     """
-    COEFFS = _load_coeffs("AbrahamsonGulerce2022_USGSGuamStage1_coeffs.csv")
+    COEFFS = _load_coeffs("AbrahamsonGulerce2022_USGSGNMIStage1_coeffs.csv")
 
 
-class AbrahamsonGulerce2022SSlab_USGSGuamStage1(AbrahamsonGulerce2022SSlab_USGSGuamStage0):
+class AbrahamsonGulerce2022SSlab_USGSGNMIStage1(AbrahamsonGulerce2022SSlab_USGSGNMIStage0):
     """
     Abrahamson and Gulerce (2020) subduction intraslab ground-motion model with 
     USGS adjustments for Guam and the Northern Mariana Islands.
     """
-    COEFFS = _load_coeffs("AbrahamsonGulerce2022_USGSGuamStage1_coeffs.csv")
+    COEFFS = _load_coeffs("AbrahamsonGulerce2022_USGSGNMIStage1_coeffs.csv")
 
 
-class AbrahamsonGulerce2022SInter_USGSGuamStage2(AbrahamsonGulerce2022SInter_USGSGuamStage1):
+class AbrahamsonGulerce2022SInter_USGSGNMIStage2(AbrahamsonGulerce2022SInter_USGSGNMIStage1):
     """
     Abrahamson and Gulerce (2020) subduction interface ground-motion model with 
     USGS adjustments for Guam and the Northern Mariana Islands.
     """
-    COEFFS = _load_coeffs("AbrahamsonGulerce2022_USGSGuamStage2_coeffs.csv")
+    COEFFS = _load_coeffs("AbrahamsonGulerce2022_USGSGNMIStage2_coeffs.csv")
 
 
-class AbrahamsonGulerce2022SSlab_USGSGuamStage2(AbrahamsonGulerce2022SSlab_USGSGuamStage1):
+class AbrahamsonGulerce2022SSlab_USGSGNMIStage2(AbrahamsonGulerce2022SSlab_USGSGNMIStage1):
     """
     Abrahamson and Gulerce (2020) subduction intraslab ground-motion model with 
     USGS adjustments for Guam and the Northern Mariana Islands.
     """
-    COEFFS = _load_coeffs("AbrahamsonGulerce2022_USGSGuamStage2_coeffs.csv")
+    COEFFS = _load_coeffs("AbrahamsonGulerce2022_USGSGNMIStage2_coeffs.csv")
 
 
-class KuehnEtAl2020SInter_USGSGuamStage0(kuehn_2020.KuehnEtAl2020SInter):
+class KuehnEtAl2020SInter_USGSGNMIStage0(kuehn_2020.KuehnEtAl2020SInter):
     """
     Kuehn et al. (2020) subduction interface ground-motion model with 
     USGS adjustments for Guam and the Northern Mariana Islands.
     """
-    COEFFS = _load_coeffs("KuehnEtAl2020_USGSGuamStage0_coeffs.csv")
+    COEFFS = _load_coeffs("KuehnEtAl2020_USGSGNMIStage0_coeffs.csv")
 
 
-class KuehnEtAl2020SSlab_USGSGuamStage0(kuehn_2020.KuehnEtAl2020SSlab):
+class KuehnEtAl2020SSlab_USGSGNMIStage0(kuehn_2020.KuehnEtAl2020SSlab):
     """
     Kuehn et al. (2020) subduction intraslab ground-motion model with 
     USGS adjustments for Guam and the Northern Mariana Islands.
     """
-    COEFFS = _load_coeffs("KuehnEtAl2020_USGSGuamStage0_coeffs.csv")
+    COEFFS = _load_coeffs("KuehnEtAl2020_USGSGNMIStage0_coeffs.csv")
 
     def compute(self, ctx: np.recarray, imts, mean, sig, tau, phi):
         """
@@ -227,52 +227,52 @@ class KuehnEtAl2020SSlab_USGSGuamStage0(kuehn_2020.KuehnEtAl2020SSlab):
             sig[m] = np.sqrt(C["tau"] ** 2.0 + C["phi"] ** 2.0)
 
 
-class KuehnEtAl2020SInter_USGSGuamStage1(KuehnEtAl2020SInter_USGSGuamStage0):
+class KuehnEtAl2020SInter_USGSGNMIStage1(KuehnEtAl2020SInter_USGSGNMIStage0):
     """
     Kuehn et al. (2020) subduction interface ground-motion model with 
     USGS adjustments for Guam and the Northern Mariana Islands.
     """
-    COEFFS = _load_coeffs("KuehnEtAl2020_USGSGuamStage1_coeffs.csv")
+    COEFFS = _load_coeffs("KuehnEtAl2020_USGSGNMIStage1_coeffs.csv")
 
 
-class KuehnEtAl2020SSlab_USGSGuamStage1(KuehnEtAl2020SSlab_USGSGuamStage0):
+class KuehnEtAl2020SSlab_USGSGNMIStage1(KuehnEtAl2020SSlab_USGSGNMIStage0):
     """
     Kuehn et al. (2020) subduction intraslab ground-motion model with 
     USGS adjustments for Guam and the Northern Mariana Islands.
     """
-    COEFFS = _load_coeffs("KuehnEtAl2020_USGSGuamStage1_coeffs.csv")
+    COEFFS = _load_coeffs("KuehnEtAl2020_USGSGNMIStage1_coeffs.csv")
 
 
-class KuehnEtAl2020SInter_USGSGuamStage2(KuehnEtAl2020SInter_USGSGuamStage1):
+class KuehnEtAl2020SInter_USGSGNMIStage2(KuehnEtAl2020SInter_USGSGNMIStage1):
     """
     Kuehn et al. (2020) subduction interface ground-motion model with 
     USGS adjustments for Guam and the Northern Mariana Islands.
     """
-    COEFFS = _load_coeffs("KuehnEtAl2020_USGSGuamStage2_coeffs.csv")
+    COEFFS = _load_coeffs("KuehnEtAl2020_USGSGNMIStage2_coeffs.csv")
 
 
-class KuehnEtAl2020SSlab_USGSGuamStage2(KuehnEtAl2020SSlab_USGSGuamStage1):
+class KuehnEtAl2020SSlab_USGSGNMIStage2(KuehnEtAl2020SSlab_USGSGNMIStage1):
     """
     Kuehn et al. (2020) subduction intraslab ground-motion model with 
     USGS adjustments for Guam and the Northern Mariana Islands.
     """
-    COEFFS = _load_coeffs("KuehnEtAl2020_USGSGuamStage2_coeffs.csv")
+    COEFFS = _load_coeffs("KuehnEtAl2020_USGSGNMIStage2_coeffs.csv")
 
 
-class ParkerEtAl2020SInter_USGSGuamStage0(parker_2020.ParkerEtAl2020SInter):
+class ParkerEtAl2020SInter_USGSGNMIStage0(parker_2020.ParkerEtAl2020SInter):
     """
     Parker et al. (2020) subduction interface ground-motion model with 
     USGS adjustments for Guam and the Northern Mariana Islands.
     """
-    COEFFS = _load_coeffs("ParkerEtAl2020_USGSGuamStage0_coeffs.csv")
+    COEFFS = _load_coeffs("ParkerEtAl2020_USGSGNMIStage0_coeffs.csv")
 
 
-class ParkerEtAl2020SSlab_USGSGuamStage0(parker_2020.ParkerEtAl2020SSlab):
+class ParkerEtAl2020SSlab_USGSGNMIStage0(parker_2020.ParkerEtAl2020SSlab):
     """
     Parker et al. (2020) subduction intraslab ground-motion model with 
     USGS adjustments for Guam and the Northern Mariana Islands.
     """
-    COEFFS = _load_coeffs("ParkerEtAl2020_USGSGuamStage0_coeffs.csv")
+    COEFFS = _load_coeffs("ParkerEtAl2020_USGSGNMIStage0_coeffs.csv")
 
     def compute(self, ctx: np.recarray, imts, mean, sig, tau, phi):
         """
@@ -311,33 +311,33 @@ class ParkerEtAl2020SSlab_USGSGuamStage0(parker_2020.ParkerEtAl2020SSlab):
             sig[m], tau[m], phi[m] = parker_2020.get_stddevs(C, ctx.rrup, ctx.vs30)
 
 
-class ParkerEtAl2020SInter_USGSGuamStage1(ParkerEtAl2020SInter_USGSGuamStage0):
+class ParkerEtAl2020SInter_USGSGNMIStage1(ParkerEtAl2020SInter_USGSGNMIStage0):
     """
     Parker et al. (2020) subduction interface ground-motion model with 
     USGS adjustments for Guam and the Northern Mariana Islands.
     """
-    COEFFS = _load_coeffs("ParkerEtAl2020_USGSGuamStage1_coeffs.csv")
+    COEFFS = _load_coeffs("ParkerEtAl2020_USGSGNMIStage1_coeffs.csv")
 
 
-class ParkerEtAl2020SSlab_USGSGuamStage1(ParkerEtAl2020SSlab_USGSGuamStage0):
+class ParkerEtAl2020SSlab_USGSGNMIStage1(ParkerEtAl2020SSlab_USGSGNMIStage0):
     """
     Parker et al. (2020) subduction intraslab ground-motion model with 
     USGS adjustments for Guam and the Northern Mariana Islands.
     """
-    COEFFS = _load_coeffs("ParkerEtAl2020_USGSGuamStage1_coeffs.csv")
+    COEFFS = _load_coeffs("ParkerEtAl2020_USGSGNMIStage1_coeffs.csv")
 
 
-class ParkerEtAl2020SInter_USGSGuamStage2(ParkerEtAl2020SInter_USGSGuamStage1):
+class ParkerEtAl2020SInter_USGSGNMIStage2(ParkerEtAl2020SInter_USGSGNMIStage1):
     """
     Parker et al. (2020) subduction interface ground-motion model with 
     USGS adjustments for Guam and the Northern Mariana Islands.
     """
-    COEFFS = _load_coeffs("ParkerEtAl2020_USGSGuamStage2_coeffs.csv")
+    COEFFS = _load_coeffs("ParkerEtAl2020_USGSGNMIStage2_coeffs.csv")
 
 
-class ParkerEtAl2020SSlab_USGSGuamStage2(ParkerEtAl2020SSlab_USGSGuamStage1):
+class ParkerEtAl2020SSlab_USGSGNMIStage2(ParkerEtAl2020SSlab_USGSGNMIStage1):
     """
     Parker et al. (2020) subduction intraslab ground-motion model with 
     USGS adjustments for Guam and the Northern Mariana Islands.
     """
-    COEFFS = _load_coeffs("ParkerEtAl2020_USGSGuamStage2_coeffs.csv")
+    COEFFS = _load_coeffs("ParkerEtAl2020_USGSGNMIStage2_coeffs.csv")
