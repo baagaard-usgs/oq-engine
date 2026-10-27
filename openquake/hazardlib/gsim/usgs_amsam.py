@@ -11,14 +11,14 @@ from openquake.hazardlib import const
 
 from openquake.hazardlib.gsim import (
     abrahamson_gulerce_2022,
-    kuehn_2020,
-    parker_2020,
+    kuehn_2022,
+    parker_2022,
     )
 
 
 class AbrahamsonGulerce2022SInter_USGSAmSamStage1(abrahamson_gulerce_2022.AbrahamsonGulerce2022SInter):
     """
-    Abrahamson and Gulerce (2020) subduction interface ground-motion model with 
+    Abrahamson and Gulerce (2022) subduction interface ground-motion model with 
     USGS adjustments for Samoa and the Northern Mariana Islands.
     """
     filename = pathlib.Path(__file__).parent / "AbrahamsonGulerce2022_USGSAmSamStage1_coeffs.csv"
@@ -28,7 +28,7 @@ class AbrahamsonGulerce2022SInter_USGSAmSamStage1(abrahamson_gulerce_2022.Abraha
 
 class AbrahamsonGulerce2022SSlab_USGSAmSamStage1(AbrahamsonGulerce2022SInter_USGSAmSamStage1):
     """
-    Abrahamson and Gulerce (2020) subduction intraslab ground-motion model with 
+    Abrahamson and Gulerce (2022) subduction intraslab ground-motion model with 
     USGS adjustments for Samoa and the Northern Mariana Islands.
     """
     #: Required rupture parameters are magnitude and top-of-rupture depth
@@ -38,28 +38,28 @@ class AbrahamsonGulerce2022SSlab_USGSAmSamStage1(AbrahamsonGulerce2022SInter_USG
     DEFINED_FOR_TECTONIC_REGION_TYPE = const.TRT.SUBDUCTION_INTRASLAB
 
 
-class KuehnEtAl2020SInter_USGSAmSamStage1(kuehn_2020.KuehnEtAl2020SInter):
+class KuehnEtAl2022SInter_USGSAmSamStage1(kuehn_2022.KuehnEtAl2022SInter):
     """
-    Kuehn et al. (2020) subduction interface ground-motion model with 
+    Kuehn et al. (2022) subduction interface ground-motion model with 
     USGS adjustments for Samoa and the Northern Mariana Islands.
     """
-    filename = pathlib.Path(__file__).parent / "KuehnEtAl2020_USGSAmSamStage1_coeffs.csv"
+    filename = pathlib.Path(__file__).parent / "KuehnEtAl2022_USGSAmSamStage1_coeffs.csv"
     with open(filename, encoding="utf-8") as f:
         COEFFS = CoeffsTable(sa_damping=5, table=f.read())
 
 
-class KuehnEtAl2020SSlab_USGSAmSamStage1(KuehnEtAl2020SInter_USGSAmSamStage1):
+class KuehnEtAl2022SSlab_USGSAmSamStage1(KuehnEtAl2022SInter_USGSAmSamStage1):
     """
-    Kuehn et al. (2020) subduction intraslab ground-motion model with 
+    Kuehn et al. (2022) subduction intraslab ground-motion model with 
     USGS adjustments for Samoa and the Northern Mariana Islands.
     """
     #: Supported tectonic region type is subduction inslab
     DEFINED_FOR_TECTONIC_REGION_TYPE = const.TRT.SUBDUCTION_INTRASLAB
 
 
-class ParkerEtAl2020SInter_USGSAmSamStage1(parker_2020.ParkerEtAl2020SInter):
+class ParkerEtAl2022SInter_USGSAmSamStage1(parker_2022.ParkerEtAl2022SInter):
     """
-    Parker et al. (2020) subduction interface ground-motion model with 
+    Parker et al. (2022) subduction interface ground-motion model with 
     USGS adjustments for Puerto Rico and the Virgin Islands.
     """
     filename = pathlib.Path(__file__).parent / "ParkerEtAl2020_USGSAmSamStage1_coeffs.csv"
@@ -67,7 +67,7 @@ class ParkerEtAl2020SInter_USGSAmSamStage1(parker_2020.ParkerEtAl2020SInter):
         COEFFS = CoeffsTable(sa_damping=5, table=f.read())
     
 
-class ParkerEtAl2020SSlab_USGSAmSamStage1(ParkerEtAl2020SInter_USGSAmSamStage1):
+class ParkerEtAl2020SSlab_USGSAmSamStage1(ParkerEtAl2022SInter_USGSAmSamStage1):
     """
     Modifications for subduction slab.
     """
@@ -86,7 +86,7 @@ class ParkerEtAl2020SSlab_USGSAmSamStage1(ParkerEtAl2020SInter_USGSAmSamStage1):
 
 class AbrahamsonGulerce2022SInter_USGSAmSamStage2(abrahamson_gulerce_2022.AbrahamsonGulerce2022SInter):
     """
-    Abrahamson and Gulerce (2020) subduction interface ground-motion model with 
+    Abrahamson and Gulerce (2022) subduction interface ground-motion model with 
     USGS adjustments for Samoa and the Northern Mariana Islands.
     """
     filename = pathlib.Path(__file__).parent / "AbrahamsonGulerce2022_USGSAmSamStage2_coeffs.csv"
@@ -96,7 +96,7 @@ class AbrahamsonGulerce2022SInter_USGSAmSamStage2(abrahamson_gulerce_2022.Abraha
 
 class AbrahamsonGulerce2022SSlab_USGSAmSamStage2(AbrahamsonGulerce2022SInter_USGSAmSamStage2):
     """
-    Abrahamson and Gulerce (2020) subduction intraslab ground-motion model with 
+    Abrahamson and Gulerce (2022) subduction intraslab ground-motion model with 
     USGS adjustments for Samoa and the Northern Mariana Islands.
     """
     #: Required rupture parameters are magnitude and top-of-rupture depth
@@ -106,28 +106,28 @@ class AbrahamsonGulerce2022SSlab_USGSAmSamStage2(AbrahamsonGulerce2022SInter_USG
     DEFINED_FOR_TECTONIC_REGION_TYPE = const.TRT.SUBDUCTION_INTRASLAB
 
 
-class KuehnEtAl2020SInter_USGSAmSamStage2(kuehn_2020.KuehnEtAl2020SInter):
+class KuehnEtAl2022SInter_USGSAmSamStage2(kuehn_2022.KuehnEtAl2022SInter):
     """
-    Kuehn et al. (2020) subduction interface ground-motion model with 
+    Kuehn et al. (2022) subduction interface ground-motion model with 
     USGS adjustments for Samoa and the Northern Mariana Islands.
     """
-    filename = pathlib.Path(__file__).parent / "KuehnEtAl2020_USGSAmSamStage2_coeffs.csv"
+    filename = pathlib.Path(__file__).parent / "KuehnEtAl2022_USGSAmSamStage2_coeffs.csv"
     with open(filename, encoding="utf-8") as f:
         COEFFS = CoeffsTable(sa_damping=5, table=f.read())
 
 
-class KuehnEtAl2020SSlab_USGSAmSamStage2(KuehnEtAl2020SInter_USGSAmSamStage2):
+class KuehnEtAl2022SSlab_USGSAmSamStage2(KuehnEtAl2022SInter_USGSAmSamStage2):
     """
-    Kuehn et al. (2020) subduction intraslab ground-motion model with 
+    Kuehn et al. (2022) subduction intraslab ground-motion model with 
     USGS adjustments for Samoa and the Northern Mariana Islands.
     """
     #: Supported tectonic region type is subduction inslab
     DEFINED_FOR_TECTONIC_REGION_TYPE = const.TRT.SUBDUCTION_INTRASLAB
 
 
-class ParkerEtAl2020SInter_USGSAmSamStage2(parker_2020.ParkerEtAl2020SInter):
+class ParkerEtAl2022SInter_USGSAmSamStage2(parker_2022.ParkerEtAl2022SInter):
     """
-    Parker et al. (2020) subduction interface ground-motion model with 
+    Parker et al. (2022) subduction interface ground-motion model with 
     USGS adjustments for Puerto Rico and the Virgin Islands.
     """
     filename = pathlib.Path(__file__).parent / "ParkerEtAl2020_USGSAmSamStage2_coeffs.csv"
@@ -135,7 +135,7 @@ class ParkerEtAl2020SInter_USGSAmSamStage2(parker_2020.ParkerEtAl2020SInter):
         COEFFS = CoeffsTable(sa_damping=5, table=f.read())
     
 
-class ParkerEtAl2020SSlab_USGSAmSamStage2(ParkerEtAl2020SInter_USGSAmSamStage2):
+class ParkerEtAl2020SSlab_USGSAmSamStage2(ParkerEtAl2022SInter_USGSAmSamStage2):
     """
     Modifications for subduction slab.
     """
