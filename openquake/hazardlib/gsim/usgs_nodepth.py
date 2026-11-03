@@ -18,7 +18,7 @@ from openquake.hazardlib.gsim import (
 
 class AbrahamsonGulerce2022SInter_NoDepth(abrahamson_gulerce_2022.AbrahamsonGulerce2022SInter):
     """
-    Abrahamson and Gulerce (2020) subduction interface ground-motion model with 
+    Abrahamson and Gulerce (2022) subduction interface ground-motion model with 
     no depth scaling.
     """
     filename = pathlib.Path(__file__).parent / "AbrahamsonGulerce2022_NoDepth_coeffs.csv"
@@ -28,7 +28,7 @@ class AbrahamsonGulerce2022SInter_NoDepth(abrahamson_gulerce_2022.AbrahamsonGule
 
 class AbrahamsonGulerce2022SSlab_NoDepth(AbrahamsonGulerce2022SInter_NoDepth):
     """
-    Abrahamson and Gulerce (2020) subduction intraslab ground-motion model with 
+    Abrahamson and Gulerce (2022) subduction intraslab ground-motion model with 
     no depth scaling.
     """
     #: Required rupture parameters are magnitude and top-of-rupture depth

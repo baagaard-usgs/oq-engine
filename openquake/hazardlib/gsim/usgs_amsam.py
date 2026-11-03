@@ -62,12 +62,12 @@ class ParkerEtAl2022SInter_USGSAmSamStage1(parker_2022.ParkerEtAl2022SInter):
     Parker et al. (2022) subduction interface ground-motion model with 
     USGS adjustments for Puerto Rico and the Virgin Islands.
     """
-    filename = pathlib.Path(__file__).parent / "ParkerEtAl2020_USGSAmSamStage1_coeffs.csv"
+    filename = pathlib.Path(__file__).parent / "ParkerEtAl2022_USGSAmSamStage1_coeffs.csv"
     with open(filename, encoding="utf-8") as f:
         COEFFS = CoeffsTable(sa_damping=5, table=f.read())
     
 
-class ParkerEtAl2020SSlab_USGSAmSamStage1(ParkerEtAl2022SInter_USGSAmSamStage1):
+class ParkerEtAl2022SSlab_USGSAmSamStage1(ParkerEtAl2022SInter_USGSAmSamStage1):
     """
     Modifications for subduction slab.
     """
@@ -130,12 +130,12 @@ class ParkerEtAl2022SInter_USGSAmSamStage2(parker_2022.ParkerEtAl2022SInter):
     Parker et al. (2022) subduction interface ground-motion model with 
     USGS adjustments for Puerto Rico and the Virgin Islands.
     """
-    filename = pathlib.Path(__file__).parent / "ParkerEtAl2020_USGSAmSamStage2_coeffs.csv"
+    filename = pathlib.Path(__file__).parent / "ParkerEtAl2022_USGSAmSamStage2_coeffs.csv"
     with open(filename, encoding="utf-8") as f:
         COEFFS = CoeffsTable(sa_damping=5, table=f.read())
     
 
-class ParkerEtAl2020SSlab_USGSAmSamStage2(ParkerEtAl2022SInter_USGSAmSamStage2):
+class ParkerEtAl2022SSlab_USGSAmSamStage2(ParkerEtAl2022SInter_USGSAmSamStage2):
     """
     Modifications for subduction slab.
     """
